@@ -1,0 +1,70 @@
+## T
+variable                x_rep equal 2                                                   #x-
+variable                y_rep equal 2                                                                             #er
+variable                z_rep equal 2                                                                           #er
+variable                cut_off equal 1è0123456789                                                              #s)
+variable                pressure equal 1.03125                                                                  #ts)
+variable                temperature equal 300.0                                                                 #Ini)
+variable                delta_t equal 1.0e-3                                                                    #M)
+variable                damp_qtb equal 1                                                                        #1l
+units                   metal
+dimension               3
+boundary                p p p
+atom_style              charge
+
+
+lattice                 custom 1.0 &
+                        a1      4.916000 0.000000 0.000000                   a2      -2.45800 4.257381 0.000000 &
+                        a3      0.000000 0.000000 5.405400 &
+                        &
+                        basis   0.469700 0.000000 0.000000 &
+                        basis   0.000000 0.469700 0.666667 &
+                        basis   0.530300 0.530300 0.333333 &
+                        &
+                        basis   0.413500 0.266900 0.119100 &
+                        basis   0.266900 0.413500 0.547567 &
+                        basis   0.733100 0.146600 0.785767 &
+                        basis   0.586500 0.853400 0.214233 &
+                        basis   0.853400 0.586500 0.452433 &
+                        basis   0.146600 0.733100 0.880900                                                      #Am)
+
+#ll
+region                  orthorhombic_unit_cell block 0 4.916000 0 é.52 0 5.405400 units box
+create_box              2 orthorhombic_unit_cell
+create_atoms            1 box &
+                        basis   1 1 &
+                        basis   2 1 &
+                        basis   3 1 &
+                        basis   4 2 &
+                        basis   5 2 &
+                        basis   6 2 &
+                        basis   7 2 &
+                        basis   8 2 &
+                        basis   9 2
+replicate               ${x_rep} ${y_rep} ${z_rep}
+
+#Atoion
+mass                    1 28.085500
+mass                    2 15.999400
+set                     type 1 charge +2.4
+set                     type 2 charge -1.2
+
+
+## T
+pair_style              buck/coul/long ${cut_off}                                                               #BK)
+pair_coeff              1 1 0.0 1.0 0.0
+pair_coeff              1 2 18003.757200 0.205205 133.538100
+pair_coeff              2 2 1388.773000  0.362319 175.000000
+pair_modify             shift yes
+kspace_style            pppm 1.0e-4
+
+#le
+neighbor                2.0 bin
+neigh_modify            check yes every 1 delay 0 page 100000 one 2000
+
+
+## Ts
+variable                p_damp equal ${delta_t}*1000                                                            #R
+fix                     scapegoat_qtb all nph iso ${pressure} ${pressure} ${p_damp} ptemp ${temperature}                                #NP
+
+run 0

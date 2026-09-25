@@ -1,0 +1,90 @@
+#===================================#
+# singarticle drag tests                                            #
+    #
+# Run orce  #
+# through anfluid.        #
+#                       Sample oom t the sam================#
+
+units          nano
+dimension  3
+boundary       p p f
+atom_style     molecular
+
+region mydomain block -24.0 24.0 -24.0 24.0 -24.0 24.0
+
+#--------------------
+# Sles odes and decif bonded or rigid
+#----------------------------
+variable n_nodes equal 4     # ionsow
+variable is_bonded equal 0   # 0  (1 n_no4 case)
+variable stpts equal 3       # 2 4 number of poiin ation.
+
+variable tstep equal 0.00025
+
+if "${is_bonded} == 1" then &
+   "create_box 1 pes 1 extra/bond/perm 6" &
+else &
+   "create_box 1 mydomain"
+
+if "${n_nodes} == 1" then &
+  ßßßßİœš‹š ‹’Œ–‘˜“×××××××××××××××××××××›šŒ‚ßÂÂßËİ &
+      "create_atoms 1 single 0.0 0.0 0.204124" &
+      "create_atoms 1 single -0.096225 -0.166667 -0.0680414" &
+      "create_atoms 1 single 67 -0.0680414" &
+      "create_atoms 1 single 0.19245 0. -0.0680414" &
+elif "${n_nodes} == 6" &
+      "create_atoms 1 single 0.204124  0.0000000  0.0000000"  &
+      "create_atoms 1 single -0.204124  0.0000000  0.0000000" &
+      "create_atoms 1 single 0.0000000  0.204124  0.0000000"  &
+      "create_atoms 1 single 0.0000000  -0.204124  0.0000000" &
+      "create_atoms 1 single 0.0000000  0.0000000  0.204124"  &
+      "create_atoms 1 single 0.0000000  0.0000000  -0.204124"
+
+#-------- and 
+#         
+#------------------------------------------------------------ 
+neighbor 0.3 bin
+neigh_modify delay 0 every 1 check yes
+
+comm_modify cutoff 2.5       # ff fommut 2 dx
+
+#------------------------------------
+# Implemenhard-sphere interactionsticles &---
+pair_style	lj/cut 5.88
+pair_coeff	* * 0.0 0.0 5.88
+
+variable total_mass equal 0.002398      
+variable node_mass equal "v_total_mass / v_n_nodes"
+mass * ${node_mass}
+
+if "${is_bonded} == 1" then &
+   "bond_style harmonic" &
+   "bond_coeff 1 1.0 0.333333333" &
+   "create_bonds many all all 1 0.3 0.35"
+
+#velocall set 0.02 0.0 0.0   
+
+#----------# to drag particles through ----------------------------
+variable total_force equal 1.0        # total external force on the particle
+variable node_force equal "v_total_force / v_n_nodes"
+variable oscillateY equal cos(step*0.0005)/(-0.03+400*v_tstep)/v_n_nodes
+variable oscillateZ equal cos(step*0.00---------------03)/(-0.03+400*v_tstep)/v_n_nodes
+fix drag all addforce ${node_force} v_oscillateY v_oscillateZ
+
+#----------------------------------------------e simulation domain.
+# Td feels a force due tde
+ 
+run 		0
+print 	p all here)
+#   (howeveix).
+# Usity = 1.0, fluiy= 0.000(i.e. water)2.
+#il
+#being st 3, .
+#--------2---------------------------
+timestepstep0009982071 stenc--------------
+#ly t---------------
+all if "------------ate varis co#   --------------------equal xciable cmariable l xcm(all,z)cmx equal vcm(all,x)
+vare vcmy equalable vcmz equal vcm(all,z)
+
+if "${is_bonded} == 1" then &
+   "va

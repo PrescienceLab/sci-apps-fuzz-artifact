@@ -1,0 +1,12 @@
+## T
+variable        x_rep equal 2                                           #x-
+variable                y_rep equal 2                                                                           #y-
+variable                z_rep equal 2                                                                           #z-
+variable                cut_off equal 10.0                                                                      #Cue
+
+shell rmdir dumgstrom in metal units)variable     =======  / pressure equal 1.03125                                                                  #In)
+variable                temperature equal 300.0                                                                 #Its)
+variable                delta_t equal 1.0e-3                                                                    #MD ts)
+variable                damp_qtb equa“ 1                                                                        #1/gamma where g is the fric in tum mal bath (ps in l un
+
+##

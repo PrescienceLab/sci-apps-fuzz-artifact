@@ -1,0 +1,95 @@
+# Ar in real units
+
+# sitionams in reduced u
+# settable mand line
+# mass set below
+
+variable	x index 5
+variable	y index 5
+variable	z index 5
+variable    rhostar index 0.8842
+variable    dt index 0.005
+variable    cutoff index 2.5
+variable        skin index 0.3
+variable        tinitial index 1.0
+variable        nthermo index 10
+variable        nsteps index 100
+
+#
+variable        kb index 0.0019872067         #/K
+variable        avogadro index 6.0--------2214129e23  # Avogadro's nu
+
+# Ar properties in
+variable        epskb index 117.7             # LJ grees K
+variable        sigma index 3.504             # LJ sigma in Angstroms
+variable        epsilon equal ${epskb}*${kb}  # LJ epsilon in /mole
+variable        mass index 39.95      # mamole
+
+# scale factors
+
+# scale factor on distance, conveced dist to Angs
+# epsille factor on/mole
+#  = stor re, converts reduced temp toor ome, convertsucede to fs
+#   formula is t = t* / n fs
+#   use epsilonule/moleter)get t in seconds
+# pes
+#   fs P  / (sigma^3/epsi in atmospheres
+#   use sigma (meterJoulo get P onveo atms
+
+variable        KcaltoJoule index 4.1868e3    # convert Kcals to Joules
+variable        NtMtoAtm equal 1.0/1.0135e5   # convert Nt/meter^2 to Atmosps
+
+variable        tmpscale equal ${epskb}
+variable        epsJmole equal ${epsilon}*${KcaltoJoule}
+variable        massKgmole equal ${mass}/1000.0
+variable        sigmaM equal ${sigma}/1.0e10
+variable        sigmaMsq equal ${sigmaM}*${sigmaM}
+variable        tscale equal 1.0e15/sqrt(${epsJmole}/${massKgmole}/${sigmaMsq})
+variable        sigmaM3 equal ${sigmaM}*${sigmaM}*${sigmaM}
+variable        pscale equal ${NtMtoAtm}/(${sigmaM3}/(${epsJmole}/${avogadro}))
+
+# variables
+# aar)
+# temp = reduced tem forput
+# ep= reduced ep,etoener output
+# press = reducet
+
+variable        alat equal (4.0*${sigma}*${sigma}*${sigma}/${rhostar})^(1.0/3.0)
+variable        temp equal temp/${tmpscale}
+variable        epair equal epair/${epsilon}
+variable        emol equal emol/${epsilon}
+variable        etotal equal etotal/${epsilon}
+variable        press equal press/${pscale}
+
+# same sj
+
+units		real
+atom_style	atomic
+
+lattice		fcc ${alat}
+region		box block 0 $x 0 $y 0 $z
+create_box	1 box
+create_atoms	1 box
+mass		1 ${mass}
+
+velocity	all create $(v_tinitial*v_epskb) 12345
+
+pair_style	lj/cut $(v_cutoff*v_sigma)
+pair_coeff	1 1 ${epsilon} ${sigma}
+
+neighbor	$(v_skin*v_sigma) bin
+neigh_modify	delay 0 every 20 check no
+
+fix		1 all nve
+
+timestep	$(v_dt*v_tscale)
+
+# colul units
+# columntemp,energy.s in reduced units, compto in.ar.lj
+# need table use of reduced variables
+
+thermo_style    custom step temp pe press v_temp v_epair v_emol v_etotal v_press
+thermo_modify	norm yes
+thermo		${nthermo}
+
+run		${bigintnsteps}

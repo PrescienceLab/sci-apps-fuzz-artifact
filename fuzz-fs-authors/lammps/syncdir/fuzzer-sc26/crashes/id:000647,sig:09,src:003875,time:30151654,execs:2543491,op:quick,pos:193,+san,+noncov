@@ -1,0 +1,21 @@
+# LAn
+# er.
+#
+#
+# Aut
+#
+# Re19)
+
+
+# x
+dimension   3
+boundary    p p p
+units       real
+atom_style      molecular
+
+# 
+pair_style  hybrid/overlay table spline 500 local/density
+
+# Re 
+pair_style `    hyb anolt_water.data
+v

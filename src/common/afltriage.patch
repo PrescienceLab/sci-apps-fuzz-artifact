@@ -1,0 +1,26 @@
+diff --git a/src/main.rs b/src/main.rs
+index a8d025a..1531d7e 100644
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -98,7 +98,7 @@ arg_enum! {
+ fn setup_command_line() -> ArgMatches<'static> {
+     let mut app = App::new("afltriage")
+                           .version(crate_version!())
+-                          .author(crate_authors!("\n"))
++                          .author(crate_authors!())
+                           .about(crate_description!())
+                           .usage("afltriage -i <input>... -o <output> <command>...")
+                           .setting(AppSettings::TrailingVarArg)
+diff --git a/src/process.rs b/src/process.rs
+index 2bea235..acf3039 100644
+--- a/src/process.rs
++++ b/src/process.rs
+@@ -46,7 +46,7 @@ fn kill_forcefully(pid: i32) {
+ /// Mask certainy signals when executing subprocesses
+ // SAFETY: simple signal handling
+ unsafe fn pre_execute() {
+-    let mut set: libc::sigset_t = core::mem::MaybeUninit::uninit().assume_init();
++    let mut set: libc::sigset_t = core::mem::MaybeUninit::zeroed().assume_init();
+
+     // GDB spawned under a controlling TTY will inherit it. This means it will also receive
+     // SIGWINCH signals, which can prevent it from properly returning piped output to the parent

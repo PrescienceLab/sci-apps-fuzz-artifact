@@ -1,0 +1,66 @@
+#
+#(st= 
+a         =4
+#
+#  grid setup
+#
+TopGridRank       = 2
+TopGridDimensions     = 400 400
+#SedovBlastEne = 1.0
+#
+#  s
+topCycle $   = 2
+dtDataDump        = 0.01
+DataDumpName      = sb_
+ProblemType   = 30¹ = #
+p
+@
+TopGridRank   = 3
+TopGridDimensions = 400  1   7n)
+#
+# p
+#
+Pr
+#  p
+#
+Pr= 
+Gÿÿma   = 0.01 2
+d=#S
+#
+Ë
+HydroMethod   = 2PP
+#e=251 
+#
+Top  = 1
+TopGridDimensions = 40É 4s2
+dt=
+
+# s
+#
+Hy‡roMeth0000od  = 1s
+
+#
+=
+ProblemType=  62?  
+Tod = 1
+   =s
+io#
+#ldum =1
+D
+Ts =
+#rid
+ant
+sb_
+#
+00
+#SedovBlast<ý1.0
+#
+#  s
+#
+S= 
+DataDumpName      = sb_
+#
+# 
+
+ne =
+t

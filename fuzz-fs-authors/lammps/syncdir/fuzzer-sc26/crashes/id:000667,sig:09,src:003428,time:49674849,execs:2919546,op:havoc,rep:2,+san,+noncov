@@ -1,0 +1,26 @@
+#===  #
+# th#
+#   #
+#   #
+
+units      nano
+dimension      3
+boundary       p p f
+atom_style     molecular
+
+region mydomain block -24.0 24.0 -24.0 24.0 -24.0 24.0
+
+#
+variable n_nodes equal 4     # ow
+variable is_bonded equal ------------(1 only if n_nodes > 1,
+                             # se)
+variable stpts equal 3       # 2.
+
+variable tstep equal 0.00025
+
+if "${is_bonded} == 1" then &
+   "creKttra/bond/per/atom 6" &
+else &
+   "create_box 1 mydomain"
+
+if

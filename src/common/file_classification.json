@@ -1,0 +1,662 @@
+{
+  "laghos": {
+    "laghos.cpp": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "fem/geom.cpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "fem/fe/fe_h1.cpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "mesh/mesh_readers.cpp": {
+      "belongs_to": "library",
+      "kind": "parser"
+    },
+    "linalg/vector.cpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "fem/qinterp/det.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "linalg/sparsemat.cpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "fem/fe/fe_pos.cpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "mesh/../fem/eltrans.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "laghos_solver.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "general/stable3d.cpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "linalg/../general/mem_manager.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "mesh/ncmesh.cpp": {
+      "belongs_to": "library",
+      "kind": "combined"
+    },
+    "linalg/kernels.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "mesh/../fem/../general/hash.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "linalg/densemat.cpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "mesh/../general/mem_manager.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "linalg/../general/array.hpp": {
+      "belongs_to": "library",
+      "kind": "combined"
+    },
+    "fem/fe_coll.cpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "general/mem_manager.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "fem/fe/fe_base.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "fem/fespace.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "mesh/../fem/intrules.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "fem/../mesh/../fem/../linalg/handle.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "linalg/sparsemat.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "general/table.cpp": {
+      "belongs_to": "library",
+      "kind": "combined"
+    },
+    "fem/../mesh/../fem/fe_coll.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "fem/fe/fe_base.cpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "fem/../general/mem_manager.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "fem/../linalg/../general/mem_manager.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "general/array.cpp": {
+      "belongs_to": "library",
+      "kind": "parser"
+    },
+    "fem/qinterp/../../fem/kernels.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "mesh/triangle.cpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "mesh/../general/array.hpp": {
+      "belongs_to": "library",
+      "kind": "combined"
+    },
+    "fem/quadinterpolator.cpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "general/table.hpp": {
+      "belongs_to": "library",
+      "kind": "parser"
+    },
+    "fem/gridfunc.cpp": {
+      "belongs_to": "library",
+      "kind": "combined"
+    },
+    "fem/fe/../../general/mem_manager.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "fem/intrules.cpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "fem/fe/fe_l2.cpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "mesh/mesh.cpp": {
+      "belongs_to": "library",
+      "kind": "combined"
+    },
+    "linalg/../general/mem_alloc.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "fem/fespace.cpp": {
+      "belongs_to": "library",
+      "kind": "combined"
+    },
+    "fem/restriction.cpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "../../mfem/general/mem_manager.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    }
+  },
+  "lammps": {
+    "lammps/src/write_dump.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "lammps/src/utils.cpp": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "lammps/src/compute_rdf.cpp": {
+      "belongs_to": "application",
+      "kind": "combined"
+    },
+    "lammps/src/pair.cpp": {
+      "belongs_to": "application",
+      "kind": "combined"
+    },
+    "lammps/src/fmt/core.h": {
+      "belongs_to": "library",
+      "kind": "combined"
+    },
+    "lammps/src/atom.h": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "lammps/src/npair_bin.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "lammps/src/platform.cpp": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "lammps/src/set.cpp": {
+      "belongs_to": "application",
+      "kind": "combined"
+    },
+    "lammps/src/variable.cpp": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "lammps/src/nbin_standard.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "lammps/src/npair_multi.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "lammps/src/domain.h": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "lammps/src/compute_reduce.cpp": {
+      "belongs_to": "application",
+      "kind": "combined"
+    },
+    "lammps/src/input.cpp": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "lammps/src/create_atoms.cpp": {
+      "belongs_to": "application",
+      "kind": "combined"
+    },
+    "lammps/src/atom.cpp": {
+      "belongs_to": "application",
+      "kind": "combined"
+    },
+    "lammps/src/dump_custom.cpp": {
+      "belongs_to": "application",
+      "kind": "combined"
+    },
+    "lammps/src/comm_brick.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "lammps/src/thermo.cpp": {
+      "belongs_to": "application",
+      "kind": "combined"
+    }
+  },
+  "enzo": {
+    "New_Grid_WriteGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "OutputLevelInformation.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_LightBosonInitialize.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_TestStarParticleInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/Grid_Collapse1DInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "combined"
+    },
+    "ReadParameterFile.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "Grid_TestGravitySphereInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "StratifiedMediumExplosionInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "Grid_FreeExpansionInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/Grid_MHD3DTestInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_StratifiedMediumExplosionInitialize.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "ImplosionInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "ZeusSource.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/Grid_CollapseMHD3DInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "combined"
+    },
+    "Grid_ConductionCloudInitialize.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "RadiatingShockInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "Grid_CRShockTubesInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_ImplosionInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_SedovBlastInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_MHD_Curl.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/MHDSweepX.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/Grid_AGNDiskInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_ComputePressure.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_ClusterInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "combined"
+    },
+    "hydro_rk/Collapse1DInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "CollapseTestInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "Grid_ConductionTestInitialize.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/Grid_MHD1DTestWavesInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/MHDDecayingRandomFieldInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "hydro_rk/Grid_MHDDecayingRandomFieldInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/GalaxyDiskInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "hydro_rk/CollapseMHD3DInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "Grid_CRTransportTestInitialize.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "RotatingCylinderInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "Grid_ShearingBoxInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_ShearingBox2DInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_RotatingDiskInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "ProtostellarCollapseInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "Grid.h": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/Rec_PLM.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/Collapse3DInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "Grid_ConvertTotalEnergyToGasEnergy.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/Turbulence_Generator.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_TestOrbitInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_ComputeTimeStep.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Zeus_zTransport.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "GalaxySimulationInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "Grid_TestGravityCheckResults.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/MHDTurbulenceInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "hydro_rk/Grid_TurbulenceInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "KHInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "ExternalBoundary_SetDoubleMachBoundary.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/Grid_Collapse3DInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "combined"
+    },
+    "Grid_ComputeRandomForcingFields.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/Grid_RungeKutta2_1stStep.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/Grid_MHDRK2_1stStep.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Group_WriteAllData.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/Grid_MHD1DTestInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "FreeExpansionInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "Grid_TestRadiatingStarParticleInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "RotatingDiskInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "hydro_rk/Grid_GalaxyDiskInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_GravityEquilibriumTestInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Zeus_xTransport.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "SedovBlastInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "Zeus_yTransport.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_ConductionBubbleInitialize.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "ClusterInitialize.C": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "Grid_PoissonSolverTestInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/Grid_MHDTurbulenceInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "ExternalBoundary_SetMagneticBoundary.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_PhotonTestInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "hydro_rk/HydroSweepX.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_KHInitializeGridRamp.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_MHDBlastInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "Grid_HydroShockTubesInitializeGrid.C": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    }
+  },
+  "gromacs": {
+    "gromacs-2025.1/src/external/rpc_xdr/xdr.cpp": {
+      "belongs_to": "library",
+      "kind": "parser"
+    },
+    "gromacs-2025.1/src/gromacs/listed_forces/disre.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "gromacs-2025.1/src/gromacs/mdlib/vsite.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "gromacs-2025.1/src/gromacs/mdlib/calc_verletbuf.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "gromacs-2025.1/src/external/boost/stl_interfaces/iterator_interface.hpp": {
+      "belongs_to": "library",
+      "kind": "non-parser"
+    },
+    "gromacs-2025.1/src/gromacs/topology/mtop_util.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "gromacs-2025.1/src/gromacs/mdrun/runner.cpp": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "gromacs-2025.1/src/gromacs/domdec/computemultibodycutoffs.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "gromacs-2025.1/src/gromacs/mdtypes/inputrec.cpp": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "gromacs-2025.1/src/gromacs/fileio/gmxfio_xdr.cpp": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "gromacs-2025.1/src/gromacs/applied_forces/awh/read_params.cpp": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "gromacs-2025.1/src/gromacs/mdtypes/md_enums.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "gromacs-2025.1/src/gromacs/mdlib/constr.h": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "gromacs-2025.1/src/gromacs/mdtypes/state.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "gromacs-2025.1/src/gromacs/mdlib/constr.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "gromacs-2025.1/src/gromacs/pbcutil/mshift.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "gromacs-2025.1/api/legacy/include/gromacs/math/vec.h": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "gromacs-2025.1/src/gromacs/fileio/tpxio.cpp": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "gromacs-2025.1/src/gromacs/mdlib/vcm.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "gromacs-2025.1/src/gromacs/mdlib/updategroups.cpp": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    },
+    "gromacs-2025.1/src/gromacs/topology/symtab.cpp": {
+      "belongs_to": "application",
+      "kind": "parser"
+    },
+    "gromacs-2025.1/src/gromacs/mdlib/calc_verletbuf.h": {
+      "belongs_to": "application",
+      "kind": "non-parser"
+    }
+  }
+}

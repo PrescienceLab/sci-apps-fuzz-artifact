@@ -1,0 +1,15 @@
+app_name := env("APP_NAME")
+
+shared-fuzz-fs := "/mnt/shared-fuzz-fs"
+host-syncdir := shared-fuzz-fs / app_name / "syncdir"
+host-triagedir := shared-fuzz-fs / app_name / "triage"
+local-syncdir := absolute_path("../fuzz" / app_name / "syncdir")
+
+fuzz:
+  common/fuzz.sh {{app_name}} {{local-syncdir}} {{host-syncdir}}
+
+triage-all:
+  common/triage.sh {{app_name}} {{host-syncdir}} {{host-triagedir}}
+
+plot-all:
+  uv run common/plot.py plot-all -d {{shared-fuzz-fs}}

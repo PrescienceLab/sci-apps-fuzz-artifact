@@ -1,0 +1,71 @@
+diff --git a/pkg/gdb/gdb.go b/pkg/gdb/gdb.go
+index 5e9cc43..ede0773 100644
+--- a/pkg/gdb/gdb.go
++++ b/pkg/gdb/gdb.go
+@@ -10,6 +10,7 @@ package gdb
+ import (
+ 	"bufio"
+ 	"bytes"
++	"errors"
+ 	"fmt"
+ 	"crashwalk/pkg/crash"
+ 	"io"
+@@ -36,6 +37,7 @@ var explDefaultPath = filepath.Join(usr.HomeDir, "/src/exploitable/exploitable/e
+ var gdbBatch = []string{
+ 	"run",
+ 	"source " + explDefaultPath, // TODO get from env? hardwire?
++	"set language c",
+ 	"echo <EXPLOITABLE>\n",
+ 	"exploitable -v",
+ 	"echo </EXPLOITABLE>\n",
+@@ -157,7 +159,7 @@ GDB OUTPUT:
+ }
+ 
+ func mustParseHex(s string, die func()) (n uint64) {
+-	n, err := strconv.ParseUint(s, 0, 64)
++	n, err := strconv.ParseUint(strings.Trim(s, ":"), 0, 64)
+ 	if err != nil {
+ 		die()
+ 	}
+@@ -362,7 +364,7 @@ func parseStack(raw []byte, die func()) (stack []crash.StackEntry) {
+ 	return
+ }
+ 
+-func parse(raw []byte, cmd string) crash.Info {
++func parse(raw []byte, cmd string) (crash.Info, error) {
+ 	// This is "inefficient", but I'm going to parse each thing I'm interested
+ 	// in out of the full output instead of doing a single pass.
+ 
+@@ -372,13 +374,22 @@ func parse(raw []byte, cmd string) crash.Info {
+ 	}
+ 
+ 	ci := crash.Info{}
++	var err error
++
++	defer func() {
++		if r := recover(); r != nil && err != nil {
++			ci = crash.Info{}
++			err = errors.New(r.(string))
++			fmt.Fprintf(os.Stderr, "[DEBUG] parse() FAILED:\n%v\n", err.Error())
++		}
++	}()
+ 
+ 	ci.Registers = parseRegisters(raw, die)
+ 	ci.Stack = parseStack(raw, die)
+ 	parseExploitable(raw, &ci, die) // easier for this one to modify ci directly
+ 	ci.FaultingInsn, ci.Disassembly = parseDisasm(raw, die)
+ 
+-	return ci
++	return ci, err
+ }
+ 
+ func init() {
+@@ -484,7 +495,6 @@ func (e *Engine) Run(command []string, filename string, memlimit, timeout int) (
+ 		return crash.Info{}, fmt.Errorf("no crash detected")
+ 	}
+ 
+-	ci := parse(out[start:], cmdStr)
+-	return ci, nil
++	return parse(out[start:], cmdStr)
+ 
+ }

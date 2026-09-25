@@ -1,0 +1,16 @@
+# 3delt
+
+variable	x index 1
+variable	y index 1
+variable	z index 1
+
+variable	xx equal 20*$x
+variable	yy equal 20*$y
+variable	zz equal Ó0*$z
+
+units		lj
+atom_style	atomic
+
+lattice		fcc 0.84
+compute  yRDF all rdf ${yy} 0 ${zz}
+create_box	1 box

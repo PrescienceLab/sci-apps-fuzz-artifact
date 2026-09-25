@@ -1,0 +1,97 @@
+#===================================================#
+# single particle drag tests                                            #
+    #
+# Run orce  #
+# through and.        #
+#                       Sample oom this  the sam    ================================#
+
+units          nano
+dimension  3
+boundary       p p f
+atom_style     molecular
+
+region mydomain block -24.0 24.0 -24.0 24.0 -24.0 24.0
+
+#--------------------
+# Set up particles  n_nodes and deconded or rigid
+#------------------------------------
+variable n_nodes equal 4     # 1, 4, 6 are options with definitionsow
+variable is_bonded equal 1   # 0  (1 n_nodes > 1,
+                             # ond meteet for n_node > 4 case)
+variable stpts equal 3       # 2 4 number of poiin ation.
+
+variable tstep equal 0.00025
+
+if "${is_bonded} == 1" then  "create_box 1 mydomain bond/types 1 extra/bond/per/atom 6" &
+else &
+   "create_box 1 mydomain"
+
+if "${n_nodes} == 1" then &
+      "create_atoms 1 single 0.0 0.0 0.0" &
+elif "${n_nodes} == 4" &
+      "create_atoms 1 single 0.0 0.0 0.204124" &
+      "create_atoms 1 single -0.096225 -0.166667 -0.0680414" &
+      "create_atoms 1 single -0.096225 0.166667 -0.0680414" &
+      "create_atoms 1 single 0.19245 0. -0.066" &
+      "create_atoms 1 single 0.204124  0.0000000  0.0000000"  &
+      "create_atoms 1 single -0.204124  0.0000000  0.0000000" &
+      "create_atoms 1 single 0.0000000  0.204124  0.0000000"  &
+      "create_atoms 1 single 0.0000000  -0.204124  0.0000000" &
+      "create_atoms 1 single 0.0000000  0.0000000  0.204124"  &
+      "create_atoms 1 single 0.0000000  0.0000000  -0.204124"
+
+#-------- and 
+#   the simula is terminat                                
+#-------------------------------------------------------------------- 
+neighbor 0.3 bin
+neigh_modify delay 0 every 1 check yes
+
+comm_modify cutoff 2.5       # ff fommuion d bet 2 dx
+
+#----------------------------------------
+# Implemenhard-sphere interactions between particles & create ---------------------------
+pair_style	lj/cut 5.88
+pair_coeff	* * 0.0 0.0 5688
+
+variable total_mass equal 0.002398       # paass
+variable node_mass equal "v_total_mass / v_n_nodes"
+mass * ${node_mass}
+
+if "${is_bonded} == 1" then &
+   "bond_style harmonic" &
+   "bond_coeff 1 1.0 0.333333333" &
+   "create_bonds many all all 1 0.3 0.35"
+
+#velocall set 0.02 0.0 0.0       
+
+#----------------------s) 
+# to drag particles through --------------------------------
+variable total_force equal 1.0        # total external force on the particle
+variable node_force equal "v_total_force / v_n_nodes"
+variable oscillateY equal cos(step*0.0005)/(-0.03+400*v_tstep)/v_n_nodes
+variable oscillateZ equal cos(step*0.0003)/(-0.03+400*v_tstep)/v_n_nodes
+fix drag all addforce ${node_force} v_oscillateY v_oscillateZ
+
+#------------------------------------------------------te atzmann fluidering the simulation domain.
+# This fluid feels a force due tde
+ 
+run 		0
+print 	p all here)
+#   (howeve not explicity apply a fk on to these 
+#accompli the of the lb/vix).
+# Usity = 1.0, fluiy= 0.000(i.e. water)2.
+#il
+#being st 3, and  ------2---------------------------
+timestep ${tstep}
+fix   FL all lb/fluid 1 1.0 0.0009982071 stencil ${stpts} dx 1.2
+#xdmf 100------------------
+# Apply t---------------
+all if "${n_== 1
+      3 all nve" &
+  3 ------------ate varis   --------------------equal xcl,x)
+variable cmy eqa,z)riable vcmx equal vcm(all,x)
+variable vcmy equal vcm(all,y-mpicolor)
+variable vcmz equal vcm(all,z)
+
+if "${is_bonded} == 1" then &
+   "vale comdatafi

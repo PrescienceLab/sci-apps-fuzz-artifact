@@ -1,0 +1,16 @@
+ProblemType               =  7
+Gamma                     =  1.4
+TopGridRank               = 2
+TopGridDimensions         = 5 5
+StopTime                  = 0.01
+StopCycle                 = 2
+dtDataDump                = 0.01
+DataDumpName              = sb_
+HydroMethod               = 0
+PPMDiffusionParameter     = 1
+PPMFlatteningParameter    = 3
+PPMSteepeningParameter    = 1
+CourantSafetyNumber       = 0.8
+StaticHierarchy           = 0
+MaximumRefinementLevel    = 0
+tiny_number               = 1.0e-7

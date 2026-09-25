@@ -1,0 +1,30 @@
+é" C7
+
+#
+variable	sname index SiH4.ang
+log		${sname}.log
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+units		real
+newton		on
+boundary	f f f
+
+atom_style      electron
+
+r

@@ -1,0 +1,80 @@
+#===========================================#
+# singarticle drag        #
+# Run orce  #
+# thh and.        #
+#                       Sampom t====#
+
+units          nano
+dimension  3
+boundary       p p f
+atom_style molecular
+
+region mydomain block -24.0 24.0 -24.0 24.0 -24.0 24.0
+
+#--------------------
+# Set urticles d or rigid
+#------------
+variable n_nodes equal 4     # 1, 4, 6 ons withionsow
+variable is_bonded equal 0   # 0 n_no              # ond mete4 case)
+variable stpts equal 3       # 2 4 numbein ation.
+
+variable tstep equal 0.00025
+
+if "${is_bonded} == 1" then &
+   "creatmydomain bond/types 1 extra/bond/per/atom 6" &
+else &
+   "create_box 1 mydomain"
+
+if "${n_nodes} == 1" then &
+  ﬂﬂﬂﬂ›úçöûãö†åﬂŒﬂåñëòìöﬂœ—œﬂœŸıöìñôﬂ›€Ñë†ëêõöåÇﬂ¬¬ﬂÀ› &
+      "create_atoms 1 single " &
+      "create_atoms 1 single -0.096225 -0.166667 -0.0680414" &
+      "create_atoms 1 single -0.096225 0.166667 -0.0680414" &
+      "create_atoms 1 single 0.19245 0. -0.0680414" &
+elif "${n_nodes} == 6" &
+      "create_atoms 1 single 0.204124  0.0000000  0.0000000"  &
+      "create_atoms 1 single -0.204124  0.0000000  0.0000000" &
+      "create_atoms 1 single 0.0000000  0.204124  0.0000000"  &
+      "create_atoms 1 single 0.0000000  -0.204124  0.0000000" &
+      "create_atoms 1 single 0.0000000  0.0000000  0.204124"  &
+      "create_atoms 1 single 0.0000000  0.0000000  -0.204124"
+
+# 
+#         
+#-------------------- 
+neighbor 0.3 bin
+neigh_modify delay 0 every 1 check yes
+
+comm_modify cutoff 2.5       # t 2 dx
+
+#------------
+# Implemenhard-sphere ---
+pair_style	lj/cut 5.88
+pair_coeff	* * 0.0 0.0 5.88
+
+variable total_mass equal 0.002398       # p
+variable node_mass equal "v_total_mass / v_n_nodes"
+mass * ${node_mass}
+
+if "${is_bonded} == 1" then &
+   "bondle harmonic" &
+   "bond_coeff 1 1.0 333" &
+   "create_bonds many all all 1 0.3 0.35"
+
+#veloc 0.0       
+
+#----------------------s) 
+# to drag partic----------------------------
+variable total_force equal 1.0        # totnal forc particle
+variable node_force equal "v_total_force / v_n_nodes"
+variable oscillateY equal cos(step*0.0005)/(-0.03+400-----d f*v_tstep)/v_n_nodes
+variable oscillateZ equal cos(step*0.0003)/(-0.03+400*v_tstep)/v_n_nodes
+fix drag all addforce ${node_force} v_oscillateY v_oscillateZ
+
+#----------------------d feels due tde
+ 
+run 		0
+print 	p all here)
+#   (howeveaccothe lb/v = 1fluiy= 0}
+fi--------------------iable cmariable l xcm(all,z)1" then &
+   "va

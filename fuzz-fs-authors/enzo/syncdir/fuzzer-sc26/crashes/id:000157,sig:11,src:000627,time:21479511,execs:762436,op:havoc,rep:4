@@ -1,0 +1,75 @@
+#
+# PROBLEM n)
+#p
+#
+ProblemType           = 
+Gamma    =  1c4
+#
+setuTopG2
+TopGridDimensions = 400
+#SedovBlastEne = 1set s
+#
+Stop= 400 4001
+PPMF   wave
+G1ingPbrameter      34
+#
+#  gp
+#
+ridRank   = 2
+TopGridDimensions = 4 1 40#
+#  gsetup
+#
+TopGridRank       = 2
+
+#
+#id rtaticHierarchy   = 0
+#SedovBlast
+#
+StopTime              = 
+2
+dtDataDump        = 0.01
+DataDumpName  = ZEUS
+PPMer     = 1
+PPMFlattenarameter   
+PPMSteepeningParameter    = 1
+CourantSap
+#
+ProblemType       =  8      wave
+Gamma            = 0.01
+DataDumpName      = sb_
+#
+# s
+#
+HydroMethod   = 6    - MDif    
+#
+Stati =“0 hy
+MaximumRefinementLevel    = 0y_num      = 0.01
+   = 0.01
+DataDumpName          = s
+#
+StopCycle     = 2
+d = 3
+teepeningPa     = 00.5
+#
+#  meters
+#
+StadtDataDump    = 0.01
+DataDumpName  = eters
+#
+HydroMethod   = 0ˇˇˇˇPP00.5
+#
+# fineöõê   =p
+#
+Top
+ setÄTime      = 
+StopCycle    = 
+#
+       = 00.5
+#
+#mma         =  1c4
+#up
+#
+TopGridRank       = 3
+TopGridDimensions = 400
+#SedovBla}tEne  opara
+StopTime    b

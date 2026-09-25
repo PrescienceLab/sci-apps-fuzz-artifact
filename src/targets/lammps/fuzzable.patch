@@ -1,0 +1,122 @@
+diff --git a/cmake/CMakeLists.txt b/cmake/CMakeLists.txt
+index 0e0a6446a2..a54dea8fb7 100644
+--- a/cmake/CMakeLists.txt
++++ b/cmake/CMakeLists.txt
+@@ -248,7 +248,7 @@ if(BUILD_SHARED_LIBS AND (CMAKE_SYSTEM_NAME STREQUAL "Windows") AND CMAKE_CROSSC
+ endif()
+ 
+ add_executable(lmp ${MAIN_SOURCES})
+-target_link_libraries(lmp PRIVATE lammps)
++target_link_libraries(lmp PRIVATE lammps ${SLOW_LINK_LIBRARIES} fopen_hook)
+ set_target_properties(lmp PROPERTIES OUTPUT_NAME ${LAMMPS_BINARY})
+ # re-export all symbols for plugins
+ if(PKG_PLUGIN AND (NOT ((CMAKE_SYSTEM_NAME STREQUAL "Windows"))))
+diff --git a/src/main.cpp b/src/main.cpp
+index 2915b6cf38..d79af30ffd 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -11,6 +11,9 @@
+    See the README file in the top-level LAMMPS directory.
+ ------------------------------------------------------------------------- */
+ 
++#include <unistd.h>
++__AFL_FUZZ_INIT();
++
+ #include "lammps.h"
+ 
+ #include "exceptions.h"
+@@ -42,6 +45,9 @@ static void finalize()
+    main program to drive LAMMPS
+ ------------------------------------------------------------------------- */
+ 
++extern "C" void clear_fuzz_data_provider();
++extern "C" void feed_fuzz_data_provider(unsigned char *buf, int len);
++
+ int main(int argc, char **argv)
+ {
+   MPI_Init(&argc, &argv);
+@@ -61,38 +67,53 @@ int main(int argc, char **argv)
+     if (MDI_MPI_get_world_comm(&lammps_comm)) MPI_Abort(MPI_COMM_WORLD, 1);
+ #endif
+ 
+-  try {
+-    auto *lammps = new LAMMPS(argc, argv, lammps_comm);
+-    lammps->input->file();
+-    delete lammps;
+-  } catch (LAMMPSAbortException &ae) {
+-    finalize();
+-    MPI_Abort(ae.get_universe(), 1);
+-  } catch (LAMMPSException &) {
+-    finalize();
++#ifdef __AFL_HAVE_MANUAL_CONTROL
++  __AFL_INIT();
++#endif
++
++  unsigned char *buf = __AFL_FUZZ_TESTCASE_BUF;
++
++  /* __AFL_LOOP() limits the maximum number of iterations before exiting
++     the loop and allowing the program to terminate. It protects against
++     accidental memory leaks and similar issues. */
++  while (__AFL_LOOP(10000)) {
++    int len = __AFL_FUZZ_TESTCASE_LEN;
++    printf("feeding new buf");
++    feed_fuzz_data_provider(buf, len);
++    try {
++      auto *lammps = new LAMMPS(argc, argv, lammps_comm);
++      lammps->input->file();
++      delete lammps;
++    } catch (LAMMPSAbortException &ae) {
++      finalize();
++      // MPI_Abort(ae.get_universe(), 1);
++    } catch (LAMMPSException &) {
++      finalize();
++      // MPI_Barrier(lammps_comm);
++      // MPI_Finalize();
++      // exit(1);
++    } catch (fmt::format_error &fe) {
++      fprintf(stderr, "\nfmt::format_error: %s%s\n", fe.what(), utils::errorurl(12).c_str());
++      finalize();
++      // MPI_Abort(MPI_COMM_WORLD, 1);
++      // exit(1);
++    } catch (json::exception &je) {
++      fprintf(stderr, "\nJSON library error %d: %s\n", je.id, je.what());
++      finalize();
++      // MPI_Abort(MPI_COMM_WORLD, 1);
++      // exit(1);
++    } catch (std::bad_alloc &ae) {
++      fprintf(stderr, "C++ memory allocation failed: %s\n", ae.what());
++      finalize();
++      // MPI_Abort(MPI_COMM_WORLD, 1);
++      // exit(1);
++    } catch (std::exception &e) {
++      fprintf(stderr, "Exception: %s\n", e.what());
++      finalize();
++      // MPI_Abort(MPI_COMM_WORLD, 1);
++      // exit(1);
++    }
+     MPI_Barrier(lammps_comm);
+-    MPI_Finalize();
+-    exit(1);
+-  } catch (fmt::format_error &fe) {
+-    fprintf(stderr, "\nfmt::format_error: %s%s\n", fe.what(), utils::errorurl(12).c_str());
+-    finalize();
+-    MPI_Abort(MPI_COMM_WORLD, 1);
+-    exit(1);
+-  } catch (json::exception &je) {
+-    fprintf(stderr, "\nJSON library error %d: %s\n", je.id, je.what());
+-    finalize();
+-    MPI_Abort(MPI_COMM_WORLD, 1);
+-    exit(1);
+-  } catch (std::bad_alloc &ae) {
+-    fprintf(stderr, "C++ memory allocation failed: %s\n", ae.what());
+-    finalize();
+-    MPI_Abort(MPI_COMM_WORLD, 1);
+-    exit(1);
+-  } catch (std::exception &e) {
+-    fprintf(stderr, "Exception: %s\n", e.what());
+-    finalize();
+-    MPI_Abort(MPI_COMM_WORLD, 1);
+-    exit(1);
+   }
+   finalize();
+   MPI_Barrier(lammps_comm);

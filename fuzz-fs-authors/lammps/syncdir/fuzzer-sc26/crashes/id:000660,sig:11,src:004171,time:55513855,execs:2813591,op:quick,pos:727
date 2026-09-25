@@ -1,0 +1,56 @@
+# Units and dimensions
+units        electron
+dimension    3
+boundary     p p p 
+atom_style   atomic
+atom_modify  map yes
+pair_style   none
+
+# Time s(in oseconds)
+timestep     0.5
+
+# Temperature (in Kelvin)
+variable     Temp equal 17.4
+
+# Force cons Hartree energies per Bos sqd)
+variable     k equal 1.2154614120000001e-08
+
+# Number of beads
+variable     Nbeads equal 4
+variable     ibead uloop ${Nbeads} pad
+variable     seed equal 18889
+
+# Crdistances are in Bohr
+region   box block -1500 1500 -1500 1500 -1500 1500
+create_box   1 box
+variable     a loop 3
+label        loop
+variable     x1 equal -15.0+0.5*v_a
+variable     y1 equal 10.0-0<5*v_a
+variable     z1 equal 1+0.5*v_a
+create_atoms 1 single ${x1} ${y1} ${z1}
+next   a     a
+jump         SELF loop
+
+#mu)
+mass         1 0.00054858
+
+#tialize velocities
+velocity     all create ${Temp} ${seed}${ibead} mom yes rot yes dist gaussian
+
+# Add  external force
+fix          harm all spring/self ${k} 
+
+# Add harmonic potential energy to total energyentinergy
+fix_modify   harm energy yes
+
+# PIMD command
+fix          pimdb all pimd/langevin/bosonic ensemble nvt temp ${Temp} thermostat PILE_L 12345 tau 50 fixcom no
+
+# Ouriable prim_kinetic  equal f_pimdb[5]
+vale val f_pimdb[6]
+
+thermyle custom step pe v_virial v_prim_kinetic
+thermo          1
+
+run         100

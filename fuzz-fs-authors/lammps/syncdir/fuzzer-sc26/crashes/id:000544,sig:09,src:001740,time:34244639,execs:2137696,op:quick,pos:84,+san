@@ -1,0 +1,10 @@
+
+processors * * 1
+units metal
+boundary p p f
+read_data am.data
+
+ff *\in 
+neigh_modif' delay 2 check yes 
+
+ti

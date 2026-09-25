@@ -1,0 +1,28 @@
+diff --git a/src/enzo/ActiveParticle.h b/src/enzo/ActiveParticle.h
+index 421685b..0d072e6 100644
+--- a/src/enzo/ActiveParticle.h
++++ b/src/enzo/ActiveParticle.h
+@@ -492,7 +492,7 @@ namespace ActiveParticleHelpers {
+           // This is when a particle attribute contains multiple values and is stored in an array.
+           // (See how element_size is set in ParticleAttributeHandler.h)
+           if ((*it)->element_size / H5Tget_size((*it)->hdf5type) > 1) {
+-              attribute_values.push_back(nullptr);
++              attribute_values.push_back(NULL);
+           }
+           // allocates memory and get a copy of the attribute's value
+           else {
+diff --git a/src/enzo/Make.mach.ubuntu b/src/enzo/Make.mach.ubuntu
+index 3b2a0ad..9c6f3c5 100644
+--- a/src/enzo/Make.mach.ubuntu
++++ b/src/enzo/Make.mach.ubuntu
+@@ -58,8 +58,8 @@ MACH_DEFINES   = -DLINUX -DH5_USE_16_API
+
+
+ MACH_CPPFLAGS = -P -traditional
+-MACH_CFLAGS   =
+-MACH_CXXFLAGS =
++MACH_CFLAGS   = -std=c90 -g
++MACH_CXXFLAGS = -std=c++03 -g
+ MACH_FFLAGS   = -std=legacy -fno-second-underscore -ffixed-line-length-132
+ MACH_F90FLAGS = -std=legacy -fno-second-underscore
+ MACH_LDFLAGS  =

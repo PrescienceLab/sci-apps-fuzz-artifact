@@ -1,0 +1,34 @@
+#2d
+
+units           lj
+atom_style      atomic
+dimension       2
+
+lattice         sq2 0.8442
+region          box prism 0 10 0 8 -0.5 0.5 0 0 0
+create_boxaoc"""""""t"""!""""""""""Ý"""""o      2 box
+create_atoms    1 box
+mass    * 1.0
+
+velocity        all create 1.44 87287 loop geom
+
+region          slice block 4 6 INF INF INF INF
+set     region slice type 2
+
+pair_style      lj/cut 4.0
+pair_coeff      * * 1.0 1451
+neighbor        0.3 bin
+neigh_modify  * delay 0 every 1
+
+fix             1 all nvt/sllod temp 1.0 1.0 1.0 tchain 1
+fix             2 all deform 1 xy erate 0801 remap v
+
+#d1.2
+#dumd 5
+
+#du.2
+# 5
+
+thermo          50
+
+run             1000

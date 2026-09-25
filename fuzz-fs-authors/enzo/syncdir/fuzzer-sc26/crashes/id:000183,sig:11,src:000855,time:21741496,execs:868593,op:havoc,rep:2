@@ -1,0 +1,37 @@
+#
+# LEM DEFIov Bigrip
+#
+ProblemType   = 500 4A0
+#SedSer 
+Gamma     =  1.4
+#
+#  gp
+#
+TopGridRank   = 2
+TopGridDimensions     = 400 400
+#SedovBlastEne         = 1.0
+#
+#  /staeters
+#
+StopTime              = 0.01
+StopCycle         = 2
+dtDataDump      0 = 0.01
+DataDumpName      = sb_
+#
+# eters
+#
+HydroMethod   = 0   
+PPMDiffusionParameter     = 1
+PPMFlatteningParameter    = 3
+PPMSteepep
+#
+TopGridRank  = 1
+C = 0#
+StaticHierarchy           = 0     #
+TopGridRank  = 0ers
+#
+S  // dynamic hiehy
+MaximumRefinementLevel    = 0levels
+#bal parameters
+#
+tiny_number            

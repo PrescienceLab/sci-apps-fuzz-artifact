@@ -1,0 +1,106 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f7c9d63..0813025 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -963,7 +963,7 @@ if (GMX_LIB_MPI)
+ endif ()
+ if (NOT GMX_SKIP_DEFAULT_CFLAGS)
+     #TODO(#3672): Use target_link_libraries(... MPI::MPI_CXX) instead of ${MPI_CXX_LINK_FLAGS}
+-    set(CMAKE_EXE_LINKER_FLAGS "${FFT_LINKER_FLAGS} ${_gmx_mpi_cxx_link_flags} ${CMAKE_EXE_LINKER_FLAGS}")
++    set(CMAKE_EXE_LINKER_FLAGS "${SLOW_LIBS_FLAGS} -lfopen_hook ${FFT_LINKER_FLAGS} ${_gmx_mpi_cxx_link_flags} ${CMAKE_EXE_LINKER_FLAGS}")
+     set(CMAKE_SHARED_LINKER_FLAGS "${FFT_LINKER_FLAGS} ${_gmx_mpi_cxx_link_flags} ${CMAKE_SHARED_LINKER_FLAGS}")
+ else()
+     message("Recommended flags which are not added because GMX_SKIP_DEFAULT_CFLAGS=yes:")
+diff --git a/src/gromacs/utility/futil.cpp b/src/gromacs/utility/futil.cpp
+index 33b3697..1fbb907 100644
+--- a/src/gromacs/utility/futil.cpp
++++ b/src/gromacs/utility/futil.cpp
+@@ -328,6 +328,7 @@ bool gmx_fexist(const std::filesystem::path& fname)
+     {
+         return false;
+     }
++    return true;
+     std::error_code errorCode;
+     return std::filesystem::exists(fname, errorCode);
+ }
+diff --git a/src/gromacs/utility/path.cpp b/src/gromacs/utility/path.cpp
+index 92eb890..3c28fae 100644
+--- a/src/gromacs/utility/path.cpp
++++ b/src/gromacs/utility/path.cpp
+@@ -219,6 +219,7 @@ bool File::exists(const std::filesystem::path& filename, NotFoundHandler onNotFo
+     {
+         return false;
+     }
++    return true;
+     FILE* test = std::fopen(filename.string().c_str(), "r");
+     if (test == nullptr)
+     {
+diff --git a/src/programs/mdrun/mdrun.cpp b/src/programs/mdrun/mdrun.cpp
+index 2bf766a..1eed36e 100644
+--- a/src/programs/mdrun/mdrun.cpp
++++ b/src/programs/mdrun/mdrun.cpp
+@@ -81,17 +81,41 @@
+ 
+ #include "mdrun_main.h"
+ 
++extern "C" void clear_fuzz_data_provider();
++extern "C" void feed_fuzz_data_provider(unsigned char* buf, int len);
++
++int fuzz_mdrun(int argc, char* argv[]) {
++  // Set up the communicator, where possible (see docs for
++  // SimulationContext).
++  MPI_Comm                 communicator = GMX_LIB_MPI ? MPI_COMM_WORLD : MPI_COMM_NULL;
++  gmx::PhysicalNodeCommunicator physicalNodeCommunicator(communicator, gmx_physicalnode_id_hash());
++  std::unique_ptr<gmx_hw_info_t> hwinfo = gmx_detect_hardware(physicalNodeCommunicator, communicator);
++
++#ifdef __AFL_HAVE_MANUAL_CONTROL
++  __AFL_INIT();
++#endif
++
++  unsigned char* buf = __AFL_FUZZ_TESTCASE_BUF;
++
++  /* __AFL_LOOP() limits the maximum number of iterations before exiting
++     the loop and allowing the program to terminate. It protects against
++     accidental memory leaks and similar issues. */
++  while (__AFL_LOOP(1000))
++  {
++    int len = __AFL_FUZZ_TESTCASE_LEN;
++    feed_fuzz_data_provider(buf, len);
++    int ret = gmx::gmx_mdrun(communicator, *hwinfo, argc, argv);
++    printf("`gmx_mdrun() returns %d; continuing loop..", ret);
++    clear_fuzz_data_provider();
++  }
++  return 0;
++}
++
+ namespace gmx
+ {
+ 
+-int gmx_mdrun(int argc, char* argv[])
+-{
+-    // Set up the communicator, where possible (see docs for
+-    // SimulationContext).
+-    MPI_Comm                 communicator = GMX_LIB_MPI ? MPI_COMM_WORLD : MPI_COMM_NULL;
+-    PhysicalNodeCommunicator physicalNodeCommunicator(communicator, gmx_physicalnode_id_hash());
+-    std::unique_ptr<gmx_hw_info_t> hwinfo = gmx_detect_hardware(physicalNodeCommunicator, communicator);
+-    return gmx_mdrun(communicator, *hwinfo, argc, argv);
++int gmx_mdrun(int argc, char* argv[]) {
++  return ::fuzz_mdrun(argc, argv);
+ }
+ 
+ int gmx_mdrun(MPI_Comm communicator, const gmx_hw_info_t& hwinfo, int argc, char* argv[])
+diff --git a/src/programs/mdrun/mdrun_main.h b/src/programs/mdrun/mdrun_main.h
+index 8c8c729..419eefa 100644
+--- a/src/programs/mdrun/mdrun_main.h
++++ b/src/programs/mdrun/mdrun_main.h
+@@ -44,6 +44,10 @@
+ 
+ #include "gromacs/utility/gmxmpi.h"
+ 
++#include <unistd.h>
++__AFL_FUZZ_INIT();
++
++
+ struct gmx_hw_info_t;
+ 
+ namespace gmx

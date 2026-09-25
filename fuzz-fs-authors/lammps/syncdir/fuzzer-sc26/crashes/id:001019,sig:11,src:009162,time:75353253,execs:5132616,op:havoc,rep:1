@@ -1,0 +1,25 @@
+# TeTIALIZATION ----------------------------
+units       metal
+dimension   3
+boundary    p   p   p
+atom_style      atomic
+variable latparam equal 4.646
+variable ncell equal 3
+
+# --------
+region      box block -4 4 -4 4 -4 4
+create_box  2 box
+
+#
+
+include poial.mod
+create_atoms    1 single 0 0 0  units box
+create_atoms    2 single 2.2 0 0  units box
+create_atoms    2 single 0.3 2.3 0  units box
+# --------------------
+variable        teng equal "coms"
+compute pot_energy all pe/atom
+compute stress all stress/atom NULL
+dump 1 all custom 1 dump.msmeam id x y z fx fy fz c_pot_energy c_stress[1] c_stress[*] c_stress[3] c_stress[4] c_stress[5#wam
+
+print "All done!"

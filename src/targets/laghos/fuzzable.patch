@@ -1,0 +1,322 @@
+diff --git a/serial/argv-fuzz-inl.h b/serial/argv-fuzz-inl.h
+new file mode 100644
+index 0000000..cb0af2b
+--- /dev/null
++++ b/serial/argv-fuzz-inl.h
+@@ -0,0 +1,141 @@
++/*
++   american fuzzy lop++ - sample argv fuzzing wrapper
++   ------------------------------------------------
++
++   Originally written by Michal Zalewski
++
++   Copyright 2015 Google Inc. All rights reserved.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at:
++
++     http://www.apache.org/licenses/LICENSE-2.0
++
++   This file shows a simple way to fuzz command-line parameters with stock
++   afl-fuzz. To use, add:
++
++   #include "/path/to/argv-fuzz-inl.h"
++
++   ...to the file containing main(), ideally placing it after all the
++   standard includes. Next, put AFL_INIT_ARGV(); near the very beginning of
++   main().
++
++   This will cause the program to read NUL-delimited input from stdin and
++   put it in argv[]. Two subsequent NULs terminate the array. Empty
++   params are encoded as a lone 0x02. Lone 0x02 can't be generated, but
++   that shouldn't matter in real life.
++
++   If you would like to always preserve argv[0], use this instead:
++   AFL_INIT_SET0("prog_name");
++
++   To enable persistent fuzzing, use the AFL_INIT_ARGV_PERSISTENT macro with
++   buf as argument, or use AFL_INIT_SET0_PERSISTENT("prog_name", buf)
++   to preserver argv[0]. buf is a pointer to a buffer containing
++   the input data for the current test case being processed defined as:
++   unsigned char *buf = __AFL_FUZZ_TESTCASE_BUF;
++*/
++
++#ifndef _HAVE_ARGV_FUZZ_INL
++#define _HAVE_ARGV_FUZZ_INL
++
++#include <stdlib.h>
++#include <unistd.h>
++
++#define AFL_INIT_ARGV()          \
++  do {                           \
++                                 \
++    argv = afl_init_argv(&argc); \
++                                 \
++  } while (0)
++
++#define AFL_INIT_SET0(_p)        \
++  do {                           \
++                                 \
++    argv = afl_init_argv(&argc); \
++    argv[0] = (_p);              \
++    if (!argc) argc = 1;         \
++                                 \
++  } while (0)
++
++#define AFL_INIT_ARGV_PERSISTENT(persistent_buff)            \
++  do {                                                       \
++                                                             \
++    argv = afl_init_argv_persistent(&argc, persistent_buff); \
++                                                             \
++  } while (0)
++
++#define AFL_INIT_SET0_PERSISTENT(_p, persistent_buff)        \
++  do {                                                       \
++                                                             \
++    argv = afl_init_argv_persistent(&argc, persistent_buff); \
++    argv[0] = (_p);                                          \
++    if (!argc) argc = 1;                                     \
++                                                             \
++  } while (0)
++
++#define MAX_CMDLINE_LEN 100000
++#define MAX_CMDLINE_PAR 50000
++
++static char **afl_init_argv(int *argc) {
++
++  static char  in_buf[MAX_CMDLINE_LEN];
++  static char *ret[MAX_CMDLINE_PAR];
++
++  char *ptr = in_buf;
++  int   rc = 0;
++
++  ssize_t num = read(0, in_buf, MAX_CMDLINE_LEN - 2);
++  if (num < 1) { _exit(1); }
++  in_buf[num] = '\0';
++  in_buf[num + 1] = '\0';
++
++  while (*ptr && rc < MAX_CMDLINE_PAR) {
++
++    ret[rc] = ptr;
++    if (ret[rc][0] == 0x02 && !ret[rc][1]) ret[rc]++;
++    rc++;
++
++    while (*ptr)
++      ptr++;
++    ptr++;
++
++  }
++
++  *argc = rc;
++
++  return ret;
++
++}
++
++static char **afl_init_argv_persistent(int           *argc,
++                                       unsigned char *persistent_buff) {
++
++  static char *ret[MAX_CMDLINE_PAR];
++
++  unsigned char *ptr = persistent_buff;
++  int            rc = 0;
++
++  while (*ptr && rc < MAX_CMDLINE_PAR) {
++
++    ret[rc] = (char *)ptr;
++    if (ret[rc][0] == 0x02 && !ret[rc][1]) ret[rc]++;
++    rc++;
++
++    while (*ptr)
++      ptr++;
++    ptr++;
++
++  }
++
++  *argc = rc;
++
++  return ret;
++
++}
++
++#undef MAX_CMDLINE_LEN
++#undef MAX_CMDLINE_PAR
++
++#endif                                              /* !_HAVE_ARGV_FUZZ_INL */
++
+diff --git a/serial/laghos.cpp b/serial/laghos.cpp
+index b2df42b..0b528e8 100644
+--- a/serial/laghos.cpp
++++ b/serial/laghos.cpp
+@@ -44,10 +44,15 @@
+ //
+ // Sample runs: see README.md, section 'Verification of Results'.
+ 
++#include <cstring>
+ #include <fstream>
+ #include <sys/time.h>
+ #include <sys/resource.h>
+ #include "laghos_solver.hpp"
++#include <istream>
++#include <iostream>
++#include <string>
++#include "argv-fuzz-inl.h"
+ 
+ using std::cout;
+ using std::endl;
+@@ -66,11 +71,39 @@ static long GetMaxRssMB();
+ static void display_banner(std::ostream&);
+ static void Checks(const int dim, const int ti, const double norm, int &checks);
+ 
++__AFL_FUZZ_INIT();
++
++struct membuf : std::streambuf
++{
++  membuf(char* begin, char* end) {
++    this->setg(begin, begin, end);
++  }
++};
++
+ int main(int argc, char *argv[])
+ {
+    // Print the banner.
+    display_banner(cout);
+ 
++#ifdef __AFL_HAVE_MANUAL_CONTROL
++   __AFL_INIT();
++#endif
++
++   unsigned char *buf = __AFL_FUZZ_TESTCASE_BUF;
++
++   /* __AFL_LOOP() limits the maximum number of iterations before exiting
++      the loop and allowing the program to terminate. It protects against
++      accidental memory leaks and similar issues. */
++   while (__AFL_LOOP(100000)) {
++
++     int len = __AFL_FUZZ_TESTCASE_LEN;
++
++     // Check that the length of the test case is at least 8 bytes
++     if (len < 8) { continue; }
++
++     // Initialize the command line arguments using the testcase buffer
++     AFL_INIT_ARGV_PERSISTENT(buf);
++
+    // Parse command-line options.
+    problem = 1;
+    int dim = 3;
+@@ -103,7 +136,7 @@ int main(int argc, char *argv[])
+ 
+    OptionsParser args(argc, argv);
+    args.AddOption(&dim, "-dim", "--dimension", "Dimension of the problem.");
+-   args.AddOption(&mesh_file, "-m", "--mesh", "Mesh file to use.");
++   args.AddOption(&mesh_file, "-m", "--mesh", "Text of Mesh file.");
+    args.AddOption(&rs_levels, "-rs", "--refine-serial",
+                   "Number of times to refine the mesh uniformly in serial.");
+    args.AddOption(&problem, "-p", "--problem", "Problem setup to use.");
+@@ -134,31 +167,46 @@ int main(int argc, char *argv[])
+    args.AddOption(&impose_visc, "-iv", "--impose-viscosity", "-niv",
+                   "--no-impose-viscosity",
+                   "Use active viscosity terms even for smooth problems.");
+-   args.AddOption(&visualization, "-vis", "--visualization", "-no-vis",
+-                  "--no-visualization",
+-                  "Enable or disable GLVis visualization.");
+-   args.AddOption(&vis_steps, "-vs", "--visualization-steps",
+-                  "Visualize every n-th timestep.");
+-   args.AddOption(&visit, "-visit", "--visit", "-no-visit", "--no-visit",
+-                  "Enable or disable VisIt visualization.");
+-   args.AddOption(&gfprint, "-print", "--print", "-no-print", "--no-print",
+-                  "Enable or disable result output (files in mfem format).");
+-   args.AddOption(&basename, "-k", "--outputfilename",
+-                  "Name of the visit dump files");
+-   args.AddOption(&device, "-d", "--device",
+-                  "Device configuration string, see Device::Configure().");
++   // args.AddOption(&visualization, "-vis", "--visualization", "-no-vis",
++   //                "--no-visualization",
++   //                "Enable or disable GLVis visualization.");
++   // args.AddOption(&vis_steps, "-vs", "--visualization-steps",
++   //                "Visualize every n-th timestep.");
++   // args.AddOption(&visit, "-visit", "--visit", "-no-visit", "--no-visit",
++   //                "Enable or disable VisIt visualization.");
++   // args.AddOption(&gfprint, "-print", "--print", "-no-print", "--no-print",
++   //                "Enable or disable result output (files in mfem format).");
++   // args.AddOption(&basename, "-k", "--outputfilename",
++   //                "Name of the visit dump files");
++   // args.AddOption(&device, "-d", "--device",
++   //                "Device configuration string, see Device::Configure().");
+    args.AddOption(&check, "-chk", "--checks", "-no-chk", "--no-checks",
+                   "Enable 2D checks.");
+    args.AddOption(&mem_usage, "-mb", "--mem", "-no-mem", "--no-mem",
+                   "Enable memory usage.");
+-   args.AddOption(&fom, "-f", "--fom", "-no-fom", "--no-fom",
+-                  "Enable figure of merit output.");
+-   args.AddOption(&dev, "-dev", "--dev", "GPU device to use.");
++   // args.AddOption(&fom, "-f", "--fom", "-no-fom", "--no-fom",
++   //                "Enable figure of merit output.");
++   // args.AddOption(&dev, "-dev", "--dev", "GPU device to use.");
+    args.Parse();
+    if (!args.Good())
+    {
+       args.PrintUsage(cout);
+-      return 1;
++      continue;
++      // return 1;
++   }
++   if (t_final > 1 || max_tsteps > 100 || max_tsteps < 0 || cg_max_iter > 50 || rs_levels > 10) {
++     for (auto i = 0; i < argc; i++) {
++       cout << std::string(argv[i]) << endl;
++     }
++     cout << "params out of range." << endl;
++     continue;
++   }
++   if (!mem_usage) {
++     for (auto i = 0; i < argc; i++) {
++       cout << std::string(argv[i]) << endl;
++     }
++     cout << "want mem_usage as coverage sentinel." << endl;
++     continue;
+    }
+    args.PrintOptions(cout);
+ 
+@@ -172,7 +220,8 @@ int main(int argc, char *argv[])
+    Mesh *mesh;
+    if (strncmp(mesh_file, "default", 7) != 0)
+    {
+-      mesh = new Mesh(mesh_file, true, true);
++      auto mesh_str = std::istringstream(std::string(mesh_file));
++      mesh = new Mesh(mesh_str, true, true);
+    }
+    else
+    {
+@@ -258,7 +307,8 @@ int main(int argc, char *argv[])
+       default:
+          cout << "Unknown ODE solver type: " << ode_solver_type << '\n';
+          delete mesh;
+-         return 3;
++         continue;
++         // return 3;
+    }
+ 
+    const int Vsize_l2 = L2FESpace.GetVSize();
+@@ -601,6 +651,8 @@ int main(int argc, char *argv[])
+    delete ode_solver;
+    delete mesh;
+ 
++   }
++
+    return 0;
+ }
+ 
+diff --git a/serial/makefile b/serial/makefile
+index 9fcf376..cba66d8 100644
+--- a/serial/makefile
++++ b/serial/makefile
+@@ -87,7 +87,7 @@ EXTRA_INC_DIR = $(or $(wildcard $(MFEM_DIR)/include/mfem),$(MFEM_DIR))
+ CCC = $(strip $(CXX) $(LAGHOS_FLAGS) $(if $(EXTRA_INC_DIR),-I$(EXTRA_INC_DIR)))
+ 
+ LAGHOS_LIBS = $(MFEM_LIBS) $(MFEM_EXT_LIBS)
+-LIBS = $(strip $(LAGHOS_LIBS) $(LDFLAGS))
++LIBS = $(strip $(LAGHOS_LIBS) $(SLOW_LIBS) $(LDFLAGS))
+ 
+ SOURCE_FILES = $(sort $(wildcard *.cpp))
+ HEADER_FILES = $(sort $(wildcard *.hpp))

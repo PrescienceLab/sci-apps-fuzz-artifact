@@ -1,0 +1,5 @@
+function fish_greeting
+    echo This container is configured to fuzz (set_color -o green)$APP_NAME(set_color normal).
+    echo Fuzzer output and plots will be found in (set_color -o)/mnt/shared-fuzz-fs/$APP_NAME/(set_color normal).
+    echo (set_color yellow)justfile(set_color normal) contains the recipes you can invoke with (set_color cyan)just(set_color normal). See README.md at the root of the repository for one-liners to invoke common workflows.
+end

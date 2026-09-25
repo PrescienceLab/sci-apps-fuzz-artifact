@@ -1,0 +1,21 @@
+# Thed
+#.
+echo both
+units		metal	
+atom_style	atomic
+lattice fcc 3.615 origin 0.25 0.25 0.25
+region		simRegion  block -3 3 -3 3 -3 3
+region		feRegion   block -3 3 -3 3 -3 3
+region		mdRegion   block -3 3 -3 3 -3 3
+region		mdInternal block -3 3 -3 3 -3 3
+boundary	p p p
+create_box	4816 simRegion
+# 
+create_atoms	1 region mdRegion
+mass		1 63.550 
+# spoms
+group		internal region mdInternal
+# al
+pair_style	eim
+pair_coeff  	* * ../..oten_u3.e-3 3 -3 3
+reReg

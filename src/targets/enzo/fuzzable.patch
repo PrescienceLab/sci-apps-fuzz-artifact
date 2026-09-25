@@ -1,0 +1,275 @@
+diff --git a/src/enzo/ActiveParticle.h b/src/enzo/ActiveParticle.h
+index 421685b..0d072e6 100644
+--- a/src/enzo/ActiveParticle.h
++++ b/src/enzo/ActiveParticle.h
+@@ -492,7 +492,7 @@ namespace ActiveParticleHelpers {
+           // This is when a particle attribute contains multiple values and is stored in an array.
+           // (See how element_size is set in ParticleAttributeHandler.h)
+           if ((*it)->element_size / H5Tget_size((*it)->hdf5type) > 1) {
+-              attribute_values.push_back(nullptr);
++              attribute_values.push_back(NULL);
+           }
+           // allocates memory and get a copy of the attribute's value
+           else {
+diff --git a/src/enzo/Make.mach.ubuntu b/src/enzo/Make.mach.ubuntu
+index 3b2a0ad..410bb6b 100644
+--- a/src/enzo/Make.mach.ubuntu
++++ b/src/enzo/Make.mach.ubuntu
+@@ -58,8 +58,8 @@ MACH_DEFINES   = -DLINUX -DH5_USE_16_API
+ 
+ 
+ MACH_CPPFLAGS = -P -traditional 
+-MACH_CFLAGS   = 
+-MACH_CXXFLAGS =
++MACH_CFLAGS   = -std=c90 -g
++MACH_CXXFLAGS = -std=c++03 -g
+ MACH_FFLAGS   = -std=legacy -fno-second-underscore -ffixed-line-length-132
+ MACH_F90FLAGS = -std=legacy -fno-second-underscore
+ MACH_LDFLAGS  = 
+@@ -99,8 +99,10 @@ LOCAL_LIBS_HYPRE  = -L$(LOCAL_HYPRE_INSTALL)/lib -lHYPRE
+ LOCAL_LIBS_PAPI   = # PAPI libraries
+ LOCAL_LIBS_MACH   = -lgfortran # Machine-dependent libraries
+ LOCAL_LIBS_GRACKLE = -L$(LOCAL_GRACKLE_INSTALL)/lib -lgrackle
++LOCAL_LIBS_HARNESS = -lfopen_hook
++LOCAL_LIBS_HARNESS_SLOW = # slower allocator + other sanitizers: use env variable
+ 
+-MACH_LIBS         = $(LOCAL_LIBS_HDF5) $(LOCAL_LIBS_MACH)
++MACH_LIBS         = $(LOCAL_LIBS_HDF5) $(LOCAL_LIBS_MACH) $(LOCAL_LIBS_HARNESS_SLOW) $(LOCAL_LIBS_HARNESS)
+ MACH_LIBS_MPI     = $(LOCAL_LIBS_MPI)
+ MACH_LIBS_HYPRE   = $(LOCAL_LIBS_HYPRE)
+ MACH_LIBS_PAPI    = $(LOCAL_LIBS_PAPI)
+diff --git a/src/enzo/enzo.C b/src/enzo/enzo.C
+index bfb466c..80432fa 100644
+--- a/src/enzo/enzo.C
++++ b/src/enzo/enzo.C
+@@ -15,6 +15,8 @@
+ /
+ ************************************************************************/
+ 
++__AFL_FUZZ_INIT();
++
+ #include "preincludes.h"
+  
+ #ifdef USE_MPI
+@@ -269,7 +271,35 @@ void PrintMemoryUsage(char *str);
+ #define MAIN_NAME main
+ #endif
+ 
+-Eint32 MAIN_NAME(Eint32 argc, char *argv[])
++
++int true_main(Eint32 argc, char *argv[]);
++
++extern "C" void feed_fuzz_data_provider(unsigned char *buf, int len);
++extern "C" void clear_fuzz_data_provider();
++
++Eint32 MAIN_NAME(Eint32 argc, char* argv[]) {
++#ifdef __AFL_HAVE_MANUAL_CONTROL
++  __AFL_INIT();
++#endif
++
++  unsigned char *buf = __AFL_FUZZ_TESTCASE_BUF;
++
++  /* __AFL_LOOP() limits the maximum number of iterations before exiting
++     the loop and allowing the program to terminate. It protects against
++     accidental memory leaks and similar issues. */
++  while (__AFL_LOOP(10000)) {
++    int len = __AFL_FUZZ_TESTCASE_LEN;
++    feed_fuzz_data_provider(buf, len);
++    int ret = true_main(argc, argv);
++    if (ret == EXIT_SUCCESS) {
++      CommunicationFinalize();
++    }
++    clear_fuzz_data_provider();
++    printf("true main() exited with %d; continuing..", ret);
++  }
++}
++
++int true_main(Eint32 argc, char *argv[])
+ {
+ 
+   int i;
+@@ -487,9 +517,9 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+ 			   WriteCoolingTimeOnly, WriteDustTemperatureOnly,
+ 			   MyProcessorNumber) == FAIL) {
+     if(int_argc==1){
+-      my_exit(EXIT_SUCCESS);
++      return EXIT_SUCCESS;
+     } else {
+-      my_exit(EXIT_FAILURE);
++      return EXIT_FAILURE;
+     }
+   }
+ 
+@@ -518,7 +548,7 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+       if (ReadAllData(ParameterFile, &TopGrid, MetaData, &Exterior, &Initialdt) == FAIL) {
+ 	if (MyProcessorNumber == ROOT_PROCESSOR)
+ 	  fprintf(stderr, "Error in ReadAllData %s.\n", ParameterFile);
+-	my_exit(EXIT_FAILURE);
++	return EXIT_FAILURE;
+       }
+ #ifdef USE_HDF5_GROUPS
+     }
+@@ -566,7 +596,7 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+  
+   if (InformationOutput) {
+     OutputLevelInformation(stdout, MetaData, LevelArray);
+-    my_exit(EXIT_SUCCESS);
++    return EXIT_SUCCESS;
+   }
+  
+  
+@@ -585,9 +615,9 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+     if (OutputAsParticleData(MetaData, LevelArray, RegionStart, RegionEnd,
+ 			     RegionStartCoordinates, RegionEndCoordinates,
+ 			     RegionLevel, "amr.particles") == FAIL)
+-      my_exit(EXIT_FAILURE);
++      return EXIT_FAILURE;
+     else
+-      my_exit(EXIT_SUCCESS);
++      return EXIT_SUCCESS;
+   } 
+ 
+  
+@@ -598,9 +628,9 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+ 		     RegionStartCoordinates, RegionEndCoordinates,
+ 		     RegionLevel, ProjectionDimension, "amr.project",
+ 		     ProjectionSmooth, &Exterior) == FAIL)
+-      my_exit(EXIT_FAILURE);
++      return EXIT_FAILURE;
+     else
+-      my_exit(EXIT_SUCCESS);
++      return EXIT_SUCCESS;
+   } 
+ 
+   int dim, dim1, dim2;
+@@ -621,9 +651,9 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+ 			  ImplicitSolver,
+ #endif
+ 			  &Exterior) == FAIL)
+-	my_exit(EXIT_FAILURE);
++	return EXIT_FAILURE;
+       else
+-	my_exit(EXIT_SUCCESS);
++	return EXIT_SUCCESS;
+     } // ENDFOR dim
+   } 
+  
+@@ -631,7 +661,7 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+     InlineHaloFinder = TRUE;
+     HaloFinderSubfind = FALSE;
+     FOF(&MetaData, LevelArray, TRUE, TRUE);
+-    my_exit(EXIT_SUCCESS);
++    return EXIT_SUCCESS;
+   }
+ 
+   if (WritePotentialOnly) {
+@@ -641,7 +671,7 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+ 		         ImplicitSolver,
+ #endif
+                 SmoothedDarkMatterOnly);
+-    my_exit(EXIT_SUCCESS);
++    return EXIT_SUCCESS;
+   }
+ 
+   if (SmoothedDarkMatterOnly) {
+@@ -651,7 +681,7 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+ 		       , ImplicitSolver
+ #endif
+                );
+-    my_exit(EXIT_SUCCESS);
++    return EXIT_SUCCESS;
+   }
+ 
+   if (WriteCoolingTimeOnly) {
+@@ -661,7 +691,7 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+ 			  , ImplicitSolver
+ #endif
+ 			  );
+-    my_exit(EXIT_SUCCESS);
++    return EXIT_SUCCESS;
+   }
+ 
+   if (WriteDustTemperatureOnly) {
+@@ -671,7 +701,7 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+ 			      , ImplicitSolver
+ #endif
+ 			  );
+-    my_exit(EXIT_SUCCESS);
++    return EXIT_SUCCESS;
+   }
+ 
+   /* Do vector analysis */
+@@ -732,7 +762,7 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+ //       fprintf(stderr, "Error in WriteAllData.\n");
+ //       return FAIL;
+ //     }
+-//     my_exit(EXIT_SUCCESS);
++//     return EXIT_SUCCESS;
+   }
+ 
+ 
+@@ -746,7 +776,7 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+     if (InitializeNew(ParameterFile, TopGrid, MetaData, Exterior, &Initialdt) == FAIL) {
+       if (MyProcessorNumber == ROOT_PROCESSOR)
+ 	fprintf(stderr, "Error in Parameter File %s.\n", ParameterFile);
+-      my_exit(EXIT_FAILURE);
++      return EXIT_FAILURE;
+     }
+     else {
+       if (MyProcessorNumber == ROOT_PROCESSOR)
+@@ -770,7 +800,7 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+   if (UseCUDA) {
+     if (InitGPU(MyProcessorNumber) != SUCCESS) {
+       printf("InitGPU failed\n");
+-      exit(1);
++      return 1;
+     }
+   }
+ #endif
+@@ -781,7 +811,7 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+   if (RadiativeTransferInitialize(ParameterFile, TopGrid, MetaData, Exterior, 
+ 				  ImplicitSolver, LevelArray) == FAIL) {
+     fprintf(stderr, "Error in RadiativeTransferInitialize.\n");
+-    my_exit(EXIT_FAILURE);
++    return EXIT_FAILURE;
+   }
+ #endif
+ 
+@@ -818,7 +848,7 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+       MetaData.AmiraGrid.AMRHDF5Close();
+       MetaData.AmiraGrid.AMRHDF5CloseSeparateParticles();
+     }
+-    my_exit(EXIT_FAILURE);
++    return EXIT_FAILURE;
+   }
+   else
+   {
+@@ -905,7 +935,7 @@ Eint32 MAIN_NAME(Eint32 argc, char *argv[])
+     fclose(flow_trace_fptr);
+ #endif
+  
+-  my_exit(EXIT_SUCCESS);
++  return EXIT_SUCCESS;
+  
+ }
+  
+diff --git a/src/enzo/macros_and_parameters.h b/src/enzo/macros_and_parameters.h
+index bb15fd8..24a4b2d 100644
+--- a/src/enzo/macros_and_parameters.h
++++ b/src/enzo/macros_and_parameters.h
+@@ -119,11 +119,11 @@
+    semicolon, or you can throw ENZO_VFAIL which must NOT have a semicolon and
+    comes enclosed in brackets.  You can supply format strings to ENZO_VFAIL.  */
+ #ifdef CONFIG_THROW_ABORT
+-#define ENZO_FAIL(A) raise(SIGABRT);
+-#define ENZO_VFAIL(A, ...) raise(SIGABRT);
++#define ENZO_FAIL(A) exit(0);
++#define ENZO_VFAIL(A, ...) exit(0);
+ #else
+-#define ENZO_FAIL(A) throw(EnzoFatalException(A, __FILE__, __LINE__));
+-#define ENZO_VFAIL(format, ...) {snprintf(current_error, 254, format, ##__VA_ARGS__); throw(EnzoFatalException(current_error, __FILE__, __LINE__));}
++#define ENZO_FAIL(A) {auto e = EnzoFatalException(A, __FILE__, __LINE__); exit(0);}
++#define ENZO_VFAIL(format, ...) {snprintf(current_error, 254, format, ##__VA_ARGS__); auto e = EnzoFatalException(current_error, __FILE__, __LINE__); exit(0);}
+ #endif
+ 
+ /* Fortran name generator (cpp blues) */
